@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gramática Formal — Derivación interactiva</title>
+<style>
+:root {
+  --color-text-primary: #e4e4e7;
+  --color-text-secondary: #a1a1aa;
+  --color-text-info: #60a5fa;
+  --color-text-success: #4ade80;
+  --color-text-warning: #fbbf24;
+  --color-background-primary: #18181b;
+  --color-background-secondary: #27272a;
+  --color-border-tertiary: #3f3f46;
+  --border-radius-lg: 12px;
+  --border-radius-md: 8px;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  padding: 2rem;
+  max-width: 720px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.section { margin: 0 0 1.5rem; }
+.section-title { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 8px; }
+.quadruple { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 1.5rem; }
+.q-card { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 12px 14px; }
+.q-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.q-value { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+.q-desc { font-size: 12px; color: var(--color-text-secondary); margin: 4px 0 0; }
+.rules-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.rule { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 14px; font-family: var(--font-mono); color: var(--color-text-primary); }
+.rule .num { color: var(--color-text-secondary); font-size: 12px; margin-right: 6px; }
+.derivation-box { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+.deriv-steps { font-family: var(--font-mono); font-size: 15px; color: var(--color-text-primary); line-height: 2; min-height: 40px; }
+.deriv-step { display: inline; }
+.highlight-nt { color: var(--color-text-info); font-weight: 500; }
+.highlight-t { color: var(--color-text-success); }
+.arrow-sym { color: var(--color-text-secondary); margin: 0 4px; }
+.btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.btn-row button {
+  font-size: 13px;
+  padding: 6px 14px;
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-row button:hover { background: var(--color-border-tertiary); }
+.result-word { font-size: 16px; font-weight: 500; color: var(--color-text-success); margin-top: 8px; }
+.legend { display: flex; gap: 16px; margin: 12px 0 0; font-size: 12px; color: var(--color-text-secondary); }
+.legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<h2 class="sr-only" style="margin-bottom: 1.5rem;">Diagrama interactivo de una gramática formal con ejemplo de derivación</h2>
+
+<div class="section">
+  <div class="section-title">Gramática G = ( Σ<sub>T</sub> , Σ<sub>N</sub> , S , P )</div>
+  <div class="quadruple">
+    <div class="q-card">
+      <p class="q-label">Σ<sub>T</sub></p>
+      <p class="q-value">{ a, b }</p>
+      <p class="q-desc">Terminales: los "ladrillos" de las palabras</p>
+    </div>
+    <div class="q-card">
+      <p class="q-label">Σ<sub>N</sub></p>
+      <p class="q-value">{ S, T }</p>
+      <p class="q-desc">No terminales: auxiliares temporales</p>
+    </div>
+    <div class="q-card">
+      <p class="q-label">S</p>
+      <p class="q-value">S</p>
+      <p class="q-desc">Axioma: punto de partida</p>
+    </div>
+    <div class="q-card">
+      <p class="q-label">P</p>
+      <p class="q-value">4 reglas</p>
+      <p class="q-desc">Producción: instrucciones de transformación</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Reglas de producción</div>
+  <div class="rules-grid">
+    <div class="rule"><span class="num">1)</span> S ::= aT</div>
+    <div class="rule"><span class="num">2)</span> T ::= a</div>
+    <div class="rule"><span class="num">3)</span> T ::= b</div>
+    <div class="rule"><span class="num">4)</span> T ::= bT</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Derivación paso a paso</div>
+  <div class="derivation-box">
+    <div class="deriv-steps" id="deriv-display">
+      <span class="highlight-nt">S</span>
+    </div>
+    <div class="btn-row">
+      <button onclick="applyRule(1)">Regla 1: S → aT</button>
+      <button onclick="applyRule(2)">Regla 2: T → a</button>
+      <button onclick="applyRule(3)">Regla 3: T → b</button>
+      <button onclick="applyRule(4)">Regla 4: T → bT</button>
+      <button onclick="resetDeriv()" style="margin-left: auto; color: var(--color-text-secondary);">Reiniciar</button>
+    </div>
+    <div id="result-msg"></div>
+    <div class="legend">
+      <span><span class="legend-dot" style="background: var(--color-text-info);"></span>No terminal (se sigue reemplazando)</span>
+      <span><span class="legend-dot" style="background: var(--color-text-success);"></span>Terminal (queda fijo)</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let steps = ['S'];
+let currentForm = ['S'];
+
+function renderSteps() {
+  const display = document.getElementById('deriv-display');
+  const resultMsg = document.getElementById('result-msg');
+  let html = '';
+  for (let i = 0; i < steps.length; i++) {
+    if (i > 0) html += '<span class="arrow-sym"> → </span>';
+    html += colorize(steps[i]);
+  }
+  display.innerHTML = html;
+
+  const hasNT = currentForm.some(s => s === 'S' || s === 'T');
+  if (!hasNT && steps.length > 1) {
+    resultMsg.innerHTML = '<div class="result-word">Palabra generada: "' + currentForm.join('') + '"</div>';
+  } else {
+    resultMsg.innerHTML = '';
+  }
+}
+
+function colorize(str) {
+  let result = '';
+  for (let ch of str) {
+    if (ch === 'S' || ch === 'T') {
+      result += '<span class="highlight-nt">' + ch + '</span>';
+    } else {
+      result += '<span class="highlight-t">' + ch + '</span>';
+    }
+  }
+  return result;
+}
+
+function applyRule(ruleNum) {
+  const hasS = currentForm.includes('S');
+  const hasT = currentForm.includes('T');
+
+  if (ruleNum === 1) {
+    if (!hasS) { flash('No hay S para reemplazar'); return; }
+    const idx = currentForm.indexOf('S');
+    currentForm.splice(idx, 1, 'a', 'T');
+  } else if (ruleNum === 2) {
+    if (!hasT) { flash('No hay T para reemplazar'); return; }
+    const idx = currentForm.indexOf('T');
+    currentForm.splice(idx, 1, 'a');
+  } else if (ruleNum === 3) {
+    if (!hasT) { flash('No hay T para reemplazar'); return; }
+    const idx = currentForm.indexOf('T');
+    currentForm.splice(idx, 1, 'b');
+  } else if (ruleNum === 4) {
+    if (!hasT) { flash('No hay T para reemplazar'); return; }
+    const idx = currentForm.indexOf('T');
+    currentForm.splice(idx, 1, 'b', 'T');
+  }
+
+  steps.push(currentForm.join(''));
+  renderSteps();
+}
+
+function flash(msg) {
+  const resultMsg = document.getElementById('result-msg');
+  resultMsg.innerHTML = '<div style="font-size:13px;color:var(--color-text-warning);margin-top:8px;">' + msg + '</div>';
+  setTimeout(() => { if (resultMsg.textContent === msg) resultMsg.innerHTML = ''; }, 2000);
+}
+
+function resetDeriv() {
+  steps = ['S'];
+  currentForm = ['S'];
+  renderSteps();
+}
+
+renderSteps();
+</script>
+
+</body>
+</html>
