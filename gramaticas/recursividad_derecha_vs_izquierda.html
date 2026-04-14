@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recursividad a derecha vs izquierda — Gramáticas formales</title>
+<style>
+:root {
+  --color-text-primary: #e4e4e7;
+  --color-text-secondary: #a1a1aa;
+  --color-text-info: #60a5fa;
+  --color-text-success: #4ade80;
+  --color-text-warning: #fbbf24;
+  --color-background-primary: #18181b;
+  --color-background-secondary: #27272a;
+  --color-background-info: rgba(96, 165, 250, 0.15);
+  --color-background-warning: rgba(251, 191, 36, 0.15);
+  --color-border-tertiary: #3f3f46;
+  --border-radius-lg: 12px;
+  --border-radius-md: 8px;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.main-title { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 12px; }
+h2 { margin-bottom: 1.5rem; }
+.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.col { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+.col-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+.col-sub { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 12px; }
+.rules-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; margin: 0 0 12px; }
+.rule-line { font-family: var(--font-mono); font-size: 13px; color: var(--color-text-primary); line-height: 1.9; }
+.nt { color: var(--color-text-info); font-weight: 500; }
+.sep { color: var(--color-text-warning); font-weight: 500; }
+.rule-note { font-size: 11px; color: var(--color-text-secondary); margin: 6px 0 0; }
+.deriv-area { min-height: 44px; margin: 0 0 10px; }
+.deriv-steps { font-family: var(--font-mono); font-size: 14px; color: var(--color-text-primary); line-height: 2.2; word-break: break-all; }
+.highlight-nt { color: var(--color-text-info); font-weight: 500; }
+.highlight-t { color: var(--color-text-success); }
+.arrow-sym { color: var(--color-text-secondary); margin: 0 3px; }
+.grow-indicator { font-size: 12px; color: var(--color-text-secondary); margin: 2px 0 8px; font-style: italic; }
+.btn-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 6px; }
+.btn-row button {
+  font-size: 12px;
+  padding: 5px 10px;
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-row button:hover { background: var(--color-border-tertiary); }
+button.reset-btn {
+  font-size: 11px;
+  padding: 4px 10px;
+  background: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+button.reset-btn:hover { background: var(--color-border-tertiary); }
+.result-word { font-size: 14px; font-weight: 500; color: var(--color-text-success); margin-top: 8px; }
+.legend { display: flex; gap: 14px; margin: 16px 0 0; font-size: 12px; color: var(--color-text-secondary); flex-wrap: wrap; }
+.legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+.escape-tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; background: var(--color-background-warning); color: var(--color-text-warning); margin-left: 4px; vertical-align: middle; }
+.recur-tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; background: var(--color-background-info); color: var(--color-text-info); margin-left: 4px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<h2>Comparación interactiva entre recursividad a derecha y recursividad a izquierda en gramáticas formales</h2>
+
+<p class="main-title">Recursividad a derecha vs recursividad a izquierda</p>
+
+<div class="columns">
+  <!-- DERECHA -->
+  <div class="col">
+    <p class="col-title">Recursividad a derecha</p>
+    <p class="col-sub">La palabra crece hacia la derecha →</p>
+    <div class="rules-box">
+      <div class="rule-line"><span class="nt">N</span> ::= a<span class="nt">N</span> <span class="recur-tag">recursión</span></div>
+      <div class="rule-line"><span class="nt">N</span> ::= a <span class="escape-tag">escape</span></div>
+      <p class="rule-note">N aparece al final (derecha) de "aN"</p>
+    </div>
+    <div class="deriv-area">
+      <div class="deriv-steps" id="deriv-r"></div>
+      <div class="grow-indicator" id="grow-r"></div>
+    </div>
+    <div class="btn-row">
+      <button onclick="applyR('recurse')">N → a<span style="color:var(--color-text-info);font-weight:500;">N</span> (recursar)</button>
+      <button onclick="applyR('escape')">N → a (escapar)</button>
+    </div>
+    <button class="reset-btn" onclick="resetR()">Reiniciar</button>
+    <div id="result-r"></div>
+  </div>
+
+  <!-- IZQUIERDA -->
+  <div class="col">
+    <p class="col-title">Recursividad a izquierda</p>
+    <p class="col-sub">La palabra crece hacia la izquierda ←</p>
+    <div class="rules-box">
+      <div class="rule-line"><span class="nt">M</span> ::= <span class="nt">M</span>b <span class="recur-tag">recursión</span></div>
+      <div class="rule-line"><span class="nt">M</span> ::= b <span class="escape-tag">escape</span></div>
+      <p class="rule-note">M aparece al inicio (izquierda) de "Mb"</p>
+    </div>
+    <div class="deriv-area">
+      <div class="deriv-steps" id="deriv-l"></div>
+      <div class="grow-indicator" id="grow-l"></div>
+    </div>
+    <div class="btn-row">
+      <button onclick="applyL('recurse')"><span style="color:var(--color-text-info);font-weight:500;">M</span>b ← (recursar)</button>
+      <button onclick="applyL('escape')">M → b (escapar)</button>
+    </div>
+    <button class="reset-btn" onclick="resetL()">Reiniciar</button>
+    <div id="result-l"></div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="legend-dot" style="background: var(--color-text-info);"></span>No terminal (se sigue reemplazando)</span>
+  <span><span class="legend-dot" style="background: var(--color-text-success);"></span>Terminal (queda fijo)</span>
+  <span><span class="recur-tag">recursión</span> autorreferencia</span>
+  <span><span class="escape-tag">escape</span> frena la recursión</span>
+</div>
+
+<script>
+let rSteps = ['N'];
+let rForm = ['N'];
+let lSteps = ['M'];
+let lForm = ['M'];
+
+function colorize(str, ntChars) {
+  let res = '';
+  for (let ch of str) {
+    if (ntChars.includes(ch)) {
+      res += '<span class="highlight-nt">' + ch + '</span>';
+    } else {
+      res += '<span class="highlight-t">' + ch + '</span>';
+    }
+  }
+  return res;
+}
+
+function renderR() {
+  const d = document.getElementById('deriv-r');
+  const g = document.getElementById('grow-r');
+  const r = document.getElementById('result-r');
+  let html = '';
+  for (let i = 0; i < rSteps.length; i++) {
+    if (i > 0) html += '<span class="arrow-sym"> → </span>';
+    html += colorize(rSteps[i], ['N']);
+  }
+  d.innerHTML = html;
+  const hasNT = rForm.includes('N');
+  if (!hasNT && rSteps.length > 1) {
+    const word = rForm.join('');
+    g.innerHTML = '';
+    r.innerHTML = '<div class="result-word">Palabra: "' + word + '" (' + word.length + ' letras "a")</div>';
+  } else if (rSteps.length > 1) {
+    const terminals = rForm.filter(s => s !== 'N').length;
+    g.innerHTML = 'Terminales fijas a la izquierda: ' + terminals + ' — N sigue a la derecha →';
+    r.innerHTML = '';
+  } else {
+    g.innerHTML = '';
+    r.innerHTML = '';
+  }
+}
+
+function renderL() {
+  const d = document.getElementById('deriv-l');
+  const g = document.getElementById('grow-l');
+  const r = document.getElementById('result-l');
+  let html = '';
+  for (let i = 0; i < lSteps.length; i++) {
+    if (i > 0) html += '<span class="arrow-sym"> → </span>';
+    html += colorize(lSteps[i], ['M']);
+  }
+  d.innerHTML = html;
+  const hasNT = lForm.includes('M');
+  if (!hasNT && lSteps.length > 1) {
+    const word = lForm.join('');
+    g.innerHTML = '';
+    r.innerHTML = '<div class="result-word">Palabra: "' + word + '" (' + word.length + ' letras "b")</div>';
+  } else if (lSteps.length > 1) {
+    const terminals = lForm.filter(s => s !== 'M').length;
+    g.innerHTML = '← M sigue a la izquierda — Terminales fijas a la derecha: ' + terminals;
+    r.innerHTML = '';
+  } else {
+    g.innerHTML = '';
+    r.innerHTML = '';
+  }
+}
+
+function applyR(action) {
+  const idx = rForm.indexOf('N');
+  if (idx === -1) { flashMsg('result-r', 'No hay N para reemplazar'); return; }
+  if (action === 'recurse') {
+    rForm.splice(idx, 1, 'a', 'N');
+  } else {
+    rForm.splice(idx, 1, 'a');
+  }
+  rSteps.push(rForm.join(''));
+  renderR();
+}
+
+function applyL(action) {
+  const idx = lForm.indexOf('M');
+  if (idx === -1) { flashMsg('result-l', 'No hay M para reemplazar'); return; }
+  if (action === 'recurse') {
+    lForm.splice(idx, 1, 'M', 'b');
+  } else {
+    lForm.splice(idx, 1, 'b');
+  }
+  lSteps.push(lForm.join(''));
+  renderL();
+}
+
+function resetR() {
+  rSteps = ['N'];
+  rForm = ['N'];
+  renderR();
+}
+
+function resetL() {
+  lSteps = ['M'];
+  lForm = ['M'];
+  renderL();
+}
+
+function flashMsg(id, msg) {
+  const el = document.getElementById(id);
+  el.innerHTML = '<div style="font-size:12px;color:var(--color-text-warning);margin-top:6px;">' + msg + '</div>';
+  setTimeout(() => { if (el.textContent === msg) el.innerHTML = ''; }, 2000);
+}
+
+renderR();
+renderL();
+</script>
+
+</body>
+</html>
