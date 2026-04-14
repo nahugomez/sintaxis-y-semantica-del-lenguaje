@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gramática BNF interactiva — Números naturales</title>
+<style>
+:root {
+  --color-text-primary: #e4e4e7;
+  --color-text-secondary: #a1a1aa;
+  --color-text-info: #60a5fa;
+  --color-text-success: #4ade80;
+  --color-text-warning: #fbbf24;
+  --color-background-primary: #18181b;
+  --color-background-secondary: #27272a;
+  --color-border-tertiary: #3f3f46;
+  --border-radius-lg: 12px;
+  --border-radius-md: 8px;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  padding: 2rem;
+  max-width: 720px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.section { margin: 0 0 1.5rem; }
+.section-title { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 8px; }
+.quadruple { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 1.5rem; }
+.q-card { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 12px 14px; }
+.q-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.q-value { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0; font-family: var(--font-mono); }
+.q-desc { font-size: 12px; color: var(--color-text-secondary); margin: 4px 0 0; }
+.bnf-box { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; margin: 0 0 1.5rem; }
+.bnf-rule { font-family: var(--font-mono); font-size: 14px; color: var(--color-text-primary); line-height: 2; }
+.bnf-nt { color: var(--color-text-info); font-weight: 500; }
+.bnf-sep { color: var(--color-text-warning); font-weight: 500; }
+.bnf-note { font-size: 12px; color: var(--color-text-secondary); margin: 8px 0 0; font-family: var(--font-sans); }
+.derivation-box { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+.deriv-steps { font-family: var(--font-mono); font-size: 15px; color: var(--color-text-primary); line-height: 2; min-height: 40px; word-break: break-all; }
+.highlight-nt { color: var(--color-text-info); font-weight: 500; }
+.highlight-t { color: var(--color-text-success); }
+.arrow-sym { color: var(--color-text-secondary); margin: 0 4px; }
+.btn-section { margin-top: 12px; }
+.btn-label { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px; }
+.btn-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 10px; }
+.btn-row button {
+  font-size: 13px;
+  padding: 6px 12px;
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-row button:hover { background: var(--color-border-tertiary); }
+.btn-digit { min-width: 38px; text-align: center; }
+.result-word { font-size: 16px; font-weight: 500; color: var(--color-text-success); margin-top: 10px; }
+.legend { display: flex; gap: 16px; margin: 12px 0 0; font-size: 12px; color: var(--color-text-secondary); }
+.legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 0 1.5rem; }
+.compare-card { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; }
+.compare-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.compare-rules { font-family: var(--font-mono); font-size: 13px; color: var(--color-text-primary); line-height: 1.9; }
+button.reset-btn {
+  font-size: 12px;
+  padding: 5px 12px;
+  background: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+button.reset-btn:hover { background: var(--color-border-tertiary); }
+</style>
+</head>
+<body>
+
+<h2 style="margin-bottom: 1.5rem;">Gramática interactiva con notación BNF para generar números naturales</h2>
+
+<div class="section">
+  <div class="section-title">Gramática G — generador de números naturales</div>
+  <div class="quadruple">
+    <div class="q-card">
+      <p class="q-label">Σ<sub>T</sub></p>
+      <p class="q-value">{ 0..9 }</p>
+      <p class="q-desc">Los dígitos</p>
+    </div>
+    <div class="q-card">
+      <p class="q-label">Σ<sub>N</sub></p>
+      <p class="q-value">{ N, C }</p>
+      <p class="q-desc">Auxiliares</p>
+    </div>
+    <div class="q-card">
+      <p class="q-label">S</p>
+      <p class="q-value">N</p>
+      <p class="q-desc">Axioma</p>
+    </div>
+    <div class="q-card">
+      <p class="q-label">P</p>
+      <p class="q-value">2 reglas</p>
+      <p class="q-desc">En notación BNF</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Sin BNF vs Con BNF</div>
+  <div class="compare">
+    <div class="compare-card">
+      <p class="compare-title">Sin notación BNF (12 reglas)</p>
+      <div class="compare-rules">
+        N ::= CN<br>
+        N ::= C<br>
+        C ::= 0<br>
+        C ::= 1<br>
+        C ::= 2<br>
+        <span style="color:var(--color-text-secondary);">...hasta...</span><br>
+        C ::= 9
+      </div>
+    </div>
+    <div class="compare-card">
+      <p class="compare-title">Con notación BNF (2 reglas)</p>
+      <div class="compare-rules">
+        <span class="bnf-nt">N</span> ::= <span class="bnf-nt">C</span><span class="bnf-nt">N</span> <span class="bnf-sep">|</span> <span class="bnf-nt">C</span><br><br>
+        <span class="bnf-nt">C</span> ::= 0 <span class="bnf-sep">|</span> 1 <span class="bnf-sep">|</span> 2 <span class="bnf-sep">|</span> 3 <span class="bnf-sep">|</span> 4 <span class="bnf-sep">|</span> 5 <span class="bnf-sep">|</span> 6 <span class="bnf-sep">|</span> 7 <span class="bnf-sep">|</span> 8 <span class="bnf-sep">|</span> 9
+      </div>
+      <p class="bnf-note">El símbolo <span class="bnf-sep" style="font-family:var(--font-mono);">|</span> significa "o": mismas reglas, escritura compacta</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Derivación paso a paso — construí un número</div>
+  <div class="derivation-box">
+    <div class="deriv-steps" id="deriv-display"><span class="highlight-nt">N</span></div>
+    <div class="btn-section">
+      <p class="btn-label">Regla 1: N se reemplaza por...</p>
+      <div class="btn-row">
+        <button onclick="applyN('CN')">CN <span style="font-size:11px;color:var(--color-text-secondary);">(seguir agregando dígitos)</span></button>
+        <button onclick="applyN('C')">C <span style="font-size:11px;color:var(--color-text-secondary);">(último dígito)</span></button>
+      </div>
+      <p class="btn-label">Regla 2: C se reemplaza por un dígito...</p>
+      <div class="btn-row">
+        <button class="btn-digit" onclick="applyC('0')">0</button>
+        <button class="btn-digit" onclick="applyC('1')">1</button>
+        <button class="btn-digit" onclick="applyC('2')">2</button>
+        <button class="btn-digit" onclick="applyC('3')">3</button>
+        <button class="btn-digit" onclick="applyC('4')">4</button>
+        <button class="btn-digit" onclick="applyC('5')">5</button>
+        <button class="btn-digit" onclick="applyC('6')">6</button>
+        <button class="btn-digit" onclick="applyC('7')">7</button>
+        <button class="btn-digit" onclick="applyC('8')">8</button>
+        <button class="btn-digit" onclick="applyC('9')">9</button>
+      </div>
+      <button class="reset-btn" onclick="resetDeriv()">Reiniciar</button>
+    </div>
+    <div id="result-msg"></div>
+    <div class="legend">
+      <span><span class="legend-dot" style="background: var(--color-text-info);"></span>No terminal</span>
+      <span><span class="legend-dot" style="background: var(--color-text-success);"></span>Terminal (fijo)</span>
+      <span><span class="legend-dot" style="background: var(--color-text-warning);"></span><span style="font-family:var(--font-mono);">|</span> = "o" (BNF)</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let steps = ['N'];
+let form = ['N'];
+
+function render() {
+  const d = document.getElementById('deriv-display');
+  const r = document.getElementById('result-msg');
+  let html = '';
+  for (let i = 0; i < steps.length; i++) {
+    if (i > 0) html += '<span class="arrow-sym"> → </span>';
+    html += colorize(steps[i]);
+  }
+  d.innerHTML = html;
+  const hasNT = form.some(s => s === 'N' || s === 'C');
+  if (!hasNT && steps.length > 1) {
+    r.innerHTML = '<div class="result-word">Número generado: ' + form.join('') + '</div>';
+  } else {
+    r.innerHTML = '';
+  }
+}
+
+function colorize(str) {
+  let res = '';
+  for (let ch of str) {
+    if (ch === 'N' || ch === 'C') {
+      res += '<span class="highlight-nt">' + ch + '</span>';
+    } else {
+      res += '<span class="highlight-t">' + ch + '</span>';
+    }
+  }
+  return res;
+}
+
+function applyN(replacement) {
+  const idx = form.indexOf('N');
+  if (idx === -1) { flash('No hay N para reemplazar'); return; }
+  if (replacement === 'CN') {
+    form.splice(idx, 1, 'C', 'N');
+  } else {
+    form.splice(idx, 1, 'C');
+  }
+  steps.push(form.join(''));
+  render();
+}
+
+function applyC(digit) {
+  const idx = form.indexOf('C');
+  if (idx === -1) { flash('No hay C para reemplazar'); return; }
+  form.splice(idx, 1, digit);
+  steps.push(form.join(''));
+  render();
+}
+
+function flash(msg) {
+  const r = document.getElementById('result-msg');
+  r.innerHTML = '<div style="font-size:13px;color:var(--color-text-warning);margin-top:8px;">' + msg + '</div>';
+  setTimeout(() => { if (r.textContent === msg) r.innerHTML = ''; }, 2000);
+}
+
+function resetDeriv() {
+  steps = ['N'];
+  form = ['N'];
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
