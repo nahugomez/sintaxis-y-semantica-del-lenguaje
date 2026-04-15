@@ -64,10 +64,12 @@ h2 { margin-bottom: 1.5rem; }
 .ex-rule { font-family: var(--font-mono); font-size: 14px; color: var(--color-text-primary); line-height: 2; }
 .ex-why { font-size: 12px; color: var(--color-text-secondary); margin: 6px 0 0; }
 .nt { color: var(--color-text-info); font-weight: 500; }
+.ctx { color: var(--color-text-warning); font-weight: 500; }
 .try-section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin: 0 0 16px; }
 .try-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 10px; }
 .try-grammar { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; margin: 0 0 12px; }
 .try-rule { font-family: var(--font-mono); font-size: 13px; color: var(--color-text-primary); line-height: 1.9; }
+.try-note { font-size: 11px; color: var(--color-text-secondary); margin: 6px 0 0; }
 .deriv-display { font-family: var(--font-mono); font-size: 14px; color: var(--color-text-primary); line-height: 2; min-height: 36px; margin: 0 0 10px; word-break: break-all; }
 .highlight-nt { color: var(--color-text-info); font-weight: 500; }
 .highlight-t { color: var(--color-text-success); }
@@ -89,11 +91,14 @@ h2 { margin-bottom: 1.5rem; }
 .inclusion { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; margin: 1.5rem 0 0; text-align: center; }
 .inclusion-text { font-family: var(--font-mono); font-size: 15px; color: var(--color-text-primary); }
 .inclusion-note { font-size: 12px; color: var(--color-text-secondary); margin: 6px 0 0; }
+.context-explain { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; margin: 0 0 12px; font-size: 13px; color: var(--color-text-primary); line-height: 1.7; }
+.context-explain .ctx-fixed { background: var(--color-background-warning); color: var(--color-text-warning); padding: 1px 4px; border-radius: 3px; font-family: var(--font-mono); font-size: 12px; }
+.context-explain .ctx-change { background: var(--color-background-info); color: var(--color-text-info); padding: 1px 4px; border-radius: 3px; font-family: var(--font-mono); font-size: 12px; }
 </style>
 </head>
 <body>
 
-<h2>Explorador interactivo de la jerarquía de Chomsky con los 4 tipos de gramáticas</h2>
+<h2>Explorador interactivo de la jerarquía de Chomsky con los 4 tipos de gramáticas — corregido</h2>
 
 <div class="tabs">
   <button class="tab active" onclick="showTab(3)">Tipo 3 <span class="tab-badge" style="background:var(--color-background-success);color:var(--color-text-success);">regular</span></button>
@@ -113,7 +118,7 @@ h2 { margin-bottom: 1.5rem; }
   </div>
   <div class="restrict-box">
     <p class="restrict-title">Restricción</p>
-    <p class="restrict-text"><strong>Izquierda:</strong> un solo símbolo no terminal<br><strong>Derecha:</strong> a lo sumo un terminal y un no terminal (en ese orden, o al revés)</p>
+    <p class="restrict-text"><strong>Izquierda:</strong> un solo símbolo no terminal<br><strong>Derecha:</strong> a lo sumo un terminal y un no terminal</p>
   </div>
   <div class="examples-grid">
     <div class="ex-card ex-ok">
@@ -185,7 +190,7 @@ h2 { margin-bottom: 1.5rem; }
   </div>
 </div>
 
-<!-- TIPO 1 -->
+<!-- TIPO 1 CORREGIDO -->
 <div class="panel" id="panel-1">
   <div class="type-header">
     <div class="type-num">1</div>
@@ -196,32 +201,50 @@ h2 { margin-bottom: 1.5rem; }
   </div>
   <div class="restrict-box">
     <p class="restrict-title">Restricción</p>
-    <p class="restrict-text"><strong>Izquierda:</strong> puede tener varios símbolos<br><strong>Condición 1:</strong> el contexto (símbolos alrededor del NT) se mantiene<br><strong>Condición 2:</strong> |lado izquierdo| ≤ |lado derecho|</p>
+    <p class="restrict-text"><strong>Izquierda:</strong> puede tener varios símbolos<br><strong>Condición 1:</strong> el contexto (símbolos alrededor del NT) se mantiene fijo<br><strong>Condición 2:</strong> |lado izquierdo| ≤ |lado derecho|</p>
   </div>
   <div class="examples-grid">
     <div class="ex-card ex-ok">
       <p class="ex-label">Válido</p>
-      <div class="ex-rule"><span class="nt">S</span><span class="nt">X</span><span class="nt">Y</span> → abcd<br>a<span class="nt">X</span> → ab<span class="nt">Y</span></div>
-      <p class="ex-why">Contexto mantenido, |izq| ≤ |der|</p>
+      <div class="ex-rule"><span class="ctx">a</span><span class="nt">X</span><span class="ctx">b</span> → <span class="ctx">a</span>YZ<span class="ctx">b</span><br><span class="ctx">5</span><span class="nt">B</span><span class="ctx">6</span> → <span class="ctx">5</span>3C<span class="ctx">6</span></div>
+      <p class="ex-why">Contexto fijo (naranja), solo cambia el NT (azul)</p>
     </div>
     <div class="ex-card ex-no">
       <p class="ex-label">Inválido para tipo 1</p>
-      <div class="ex-rule"><span class="nt">S</span><span class="nt">X</span><span class="nt">Y</span> → ab<br>a<span class="nt">X</span> → b<span class="nt">X</span></div>
-      <p class="ex-why">SXY→ab: |3| > |2|. aX→bX: "a" cambió a "b"</p>
+      <div class="ex-rule"><span class="nt">T</span>a → a<span class="nt">T</span><br><span class="nt">S</span><span class="nt">X</span><span class="nt">Y</span> → ab</div>
+      <p class="ex-why">Ta→aT: "a" cambia de lugar. SXY→ab: |3|>|2|</p>
     </div>
   </div>
+
+  <div class="context-explain">
+    <strong>¿Cómo leer una regla tipo 1?</strong><br>
+    Ejemplo: <span class="ctx-fixed">5</span> <span class="ctx-change">B</span> <span class="ctx-fixed">6</span> → <span class="ctx-fixed">5</span> <span class="ctx-change">3C</span> <span class="ctx-fixed">6</span><br>
+    Los símbolos <span class="ctx-fixed">fijos</span> son el contexto (condición para aplicar la regla).<br>
+    El símbolo que <span class="ctx-change">cambia</span> es el reemplazo real (B se convierte en 3C).
+  </div>
+
   <div class="try-section">
-    <p class="try-title">Probá esta gramática tipo 1 — genera aⁿbⁿcⁿ</p>
+    <p class="try-title">Probá esta gramática tipo 1</p>
     <div class="try-grammar">
-      <div class="try-rule">Σ<sub>T</sub> = { a, b, c } &nbsp; Σ<sub>N</sub> = { S, T } &nbsp; S = S</div>
-      <div class="try-rule"><span class="nt">S</span> ::= abc | a<span class="nt">T</span><span class="nt">S</span>c &nbsp;&nbsp; <span class="nt">T</span>a ::= a<span class="nt">T</span> &nbsp;&nbsp; <span class="nt">T</span>b ::= bb</div>
+      <div class="try-rule">Σ<sub>T</sub> = { a, b } &nbsp; Σ<sub>N</sub> = { S, X } &nbsp; S = S</div>
+      <div class="try-rule">
+        <span class="nt">S</span> ::= ab<span class="nt">X</span><span class="nt">S</span> | ab
+        &nbsp;&nbsp;
+        <span class="ctx">a</span><span class="nt">X</span> → <span class="ctx">a</span>ba
+        &nbsp;&nbsp;
+        <span class="ctx">b</span><span class="nt">X</span> → <span class="ctx">b</span>ab
+      </div>
+      <div class="try-note">
+        En <span style="font-family:var(--font-mono);">aX → aba</span>: la "a" es contexto fijo, X se reemplaza por "ba"<br>
+        En <span style="font-family:var(--font-mono);">bX → bab</span>: la "b" es contexto fijo, X se reemplaza por "ab"
+      </div>
     </div>
     <div class="deriv-display" id="deriv-1"></div>
     <div class="btn-row">
-      <button onclick="apply1('S','aTSc')">S → aTSc</button>
-      <button onclick="apply1('S','abc')">S → abc</button>
-      <button onclick="apply1('Ta','aT')">Ta → aT</button>
-      <button onclick="apply1('Tb','bb')">Tb → bb</button>
+      <button onclick="apply1('S','abXS')">S → abXS</button>
+      <button onclick="apply1('S','ab')">S → ab</button>
+      <button onclick="apply1('aX','aba')">aX → aba <span style="font-size:10px;color:var(--color-text-secondary);">(contexto: a_)</span></button>
+      <button onclick="apply1('bX','bab')">bX → bab <span style="font-size:10px;color:var(--color-text-secondary);">(contexto: b_)</span></button>
       <button onclick="reset1()" style="color:var(--color-text-secondary);">Reiniciar</button>
     </div>
     <div class="result-msg" id="res-1"></div>
@@ -256,17 +279,24 @@ h2 { margin-bottom: 1.5rem; }
   <div class="try-section">
     <p class="try-title">Probá esta gramática tipo 0</p>
     <div class="try-grammar">
-      <div class="try-rule">Σ<sub>T</sub> = { a, b, c } &nbsp; Σ<sub>N</sub> = { S, T } &nbsp; S = S</div>
-      <div class="try-rule"><span class="nt">S</span> ::= a<span class="nt">T</span><span class="nt">S</span>c | abc &nbsp;&nbsp; <span class="nt">T</span>a ::= a<span class="nt">T</span> &nbsp;&nbsp; <span class="nt">T</span>b ::= bb</div>
-      <div class="try-rule">abc ::= c <span style="font-size:11px;color:var(--color-text-secondary);">← ¡|izq| > |der|! Solo posible en tipo 0</span></div>
+      <div class="try-rule">Σ<sub>T</sub> = { a, b } &nbsp; Σ<sub>N</sub> = { S, T } &nbsp; S = S</div>
+      <div class="try-rule">
+        <span class="nt">S</span> ::= a<span class="nt">T</span>b | ab
+        &nbsp;&nbsp;
+        <span class="nt">T</span>a → a<span class="nt">T</span>
+        <span style="font-size:11px;color:var(--color-text-secondary);">← contexto NO se mantiene</span>
+      </div>
+      <div class="try-rule">
+        <span class="nt">T</span>b → bb
+        <span style="font-size:11px;color:var(--color-text-secondary);">← |izq|=|der| pero "b" cambia de rol</span>
+      </div>
     </div>
     <div class="deriv-display" id="deriv-0"></div>
     <div class="btn-row">
-      <button onclick="apply0('S','aTSc')">S → aTSc</button>
-      <button onclick="apply0('S','abc')">S → abc</button>
-      <button onclick="apply0('Ta','aT')">Ta → aT</button>
+      <button onclick="apply0('S','aTb')">S → aTb</button>
+      <button onclick="apply0('S','ab')">S → ab</button>
+      <button onclick="apply0('Ta','aT')">Ta → aT <span style="font-size:10px;color:var(--color-text-danger);">contexto NO fijo</span></button>
       <button onclick="apply0('Tb','bb')">Tb → bb</button>
-      <button onclick="apply0('abc','c')">abc → c</button>
       <button onclick="reset0()" style="color:var(--color-text-secondary);">Reiniciar</button>
     </div>
     <div class="result-msg" id="res-0"></div>
@@ -288,86 +318,6 @@ function showTab(n) {
   });
 }
 
-// --- TIPO 3 ---
-let s3 = ['A'], f3 = ['A'];
-function render3() {
-  const d = document.getElementById('deriv-3');
-  const r = document.getElementById('res-3');
-  d.innerHTML = s3.map(s => col(s, ['A','B'])).join('<span class="arrow-sym"> → </span>');
-  const hasNT = f3.some(c => c==='A'||c==='B');
-  r.innerHTML = !hasNT && s3.length>1 ? '<span class="result-msg">Palabra: "'+f3.join('')+'"</span>' : '';
-}
-function apply3(nt, repl) {
-  const str = f3.join('');
-  const idx = str.indexOf(nt);
-  if (idx===-1) { flash3('No hay '+nt+' para reemplazar'); return; }
-  const arr = str.substring(0,idx) + repl + str.substring(idx+nt.length);
-  f3 = arr.split('');
-  s3.push(f3.join(''));
-  render3();
-}
-function reset3() { s3=['A']; f3=['A']; render3(); document.getElementById('res-3').innerHTML=''; }
-function flash3(m) { const r=document.getElementById('res-3'); r.innerHTML='<span class="warn-msg">'+m+'</span>'; setTimeout(()=>{if(r.textContent===m)r.innerHTML='';},2000); }
-
-// --- TIPO 2 ---
-let s2 = ['S'], f2 = ['S'];
-function render2() {
-  const d = document.getElementById('deriv-2');
-  const r = document.getElementById('res-2');
-  d.innerHTML = s2.map(s => col(s, ['S'])).join('<span class="arrow-sym"> → </span>');
-  const hasNT = f2.some(c => c==='S');
-  r.innerHTML = !hasNT && s2.length>1 ? '<span class="result-msg">Palabra: "'+f2.join('')+'" — misma cantidad de a y b</span>' : '';
-}
-function apply2(repl) {
-  const str = f2.join('');
-  const idx = str.indexOf('S');
-  if (idx===-1) { flash2('No hay S para reemplazar'); return; }
-  const arr = str.substring(0,idx) + repl + str.substring(idx+1);
-  f2 = arr.split('');
-  s2.push(f2.join(''));
-  render2();
-}
-function reset2() { s2=['S']; f2=['S']; render2(); document.getElementById('res-2').innerHTML=''; }
-function flash2(m) { const r=document.getElementById('res-2'); r.innerHTML='<span class="warn-msg">'+m+'</span>'; setTimeout(()=>{if(r.textContent===m)r.innerHTML='';},2000); }
-
-// --- TIPO 1 ---
-let s1 = ['S'], f1str = 'S';
-function render1() {
-  const d = document.getElementById('deriv-1');
-  const r = document.getElementById('res-1');
-  d.innerHTML = s1.map(s => col(s, ['S','T'])).join('<span class="arrow-sym"> → </span>');
-  const hasNT = /[ST]/.test(f1str);
-  r.innerHTML = !hasNT && s1.length>1 ? '<span class="result-msg">Palabra: "'+f1str+'"</span>' : '';
-}
-function apply1(from, to) {
-  const idx = f1str.indexOf(from);
-  if (idx===-1) { flash1('No se encuentra "'+from+'" en la forma actual'); return; }
-  f1str = f1str.substring(0,idx) + to + f1str.substring(idx+from.length);
-  s1.push(f1str);
-  render1();
-}
-function reset1() { s1=['S']; f1str='S'; render1(); document.getElementById('res-1').innerHTML=''; }
-function flash1(m) { const r=document.getElementById('res-1'); r.innerHTML='<span class="warn-msg">'+m+'</span>'; setTimeout(()=>{if(r.textContent===m)r.innerHTML='';},2000); }
-
-// --- TIPO 0 ---
-let s0 = ['S'], f0str = 'S';
-function render0() {
-  const d = document.getElementById('deriv-0');
-  const r = document.getElementById('res-0');
-  d.innerHTML = s0.map(s => col(s, ['S','T'])).join('<span class="arrow-sym"> → </span>');
-  const hasNT = /[ST]/.test(f0str);
-  r.innerHTML = !hasNT && s0.length>1 ? '<span class="result-msg">Palabra: "'+f0str+'"</span>' : '';
-}
-function apply0(from, to) {
-  const idx = f0str.indexOf(from);
-  if (idx===-1) { flash0('No se encuentra "'+from+'" en la forma actual'); return; }
-  f0str = f0str.substring(0,idx) + to + f0str.substring(idx+from.length);
-  s0.push(f0str);
-  render0();
-}
-function reset0() { s0=['S']; f0str='S'; render0(); document.getElementById('res-0').innerHTML=''; }
-function flash0(m) { const r=document.getElementById('res-0'); r.innerHTML='<span class="warn-msg">'+m+'</span>'; setTimeout(()=>{if(r.textContent===m)r.innerHTML='';},2000); }
-
 function col(str, nts) {
   let res = '';
   for (let ch of str) {
@@ -377,7 +327,56 @@ function col(str, nts) {
   return res;
 }
 
-render3(); render2(); render1(); render0();
+function genericApply(state, from, to, nts, derivId, resId) {
+  const idx = state.str.indexOf(from);
+  if (idx === -1) { flashG(resId, 'No se encuentra "'+from+'" en la forma actual'); return; }
+  state.str = state.str.substring(0, idx) + to + state.str.substring(idx + from.length);
+  state.steps.push(state.str);
+  renderG(state, nts, derivId, resId);
+}
+
+function renderG(state, nts, derivId, resId) {
+  const d = document.getElementById(derivId);
+  const r = document.getElementById(resId);
+  d.innerHTML = state.steps.map(s => col(s, nts)).join('<span class="arrow-sym"> → </span>');
+  const hasNT = nts.some(nt => state.str.includes(nt));
+  if (!hasNT && state.steps.length > 1) {
+    r.innerHTML = '<span class="result-msg">Palabra generada: "' + state.str + '"</span>';
+  } else {
+    r.innerHTML = '';
+  }
+}
+
+function flashG(resId, msg) {
+  const r = document.getElementById(resId);
+  r.innerHTML = '<span class="warn-msg">' + msg + '</span>';
+  setTimeout(() => { if (r.textContent === msg) r.innerHTML = ''; }, 2000);
+}
+
+// TIPO 3
+let st3 = { steps: ['A'], str: 'A' };
+function apply3(from, to) { genericApply(st3, from, to, ['A','B'], 'deriv-3', 'res-3'); }
+function reset3() { st3 = { steps: ['A'], str: 'A' }; renderG(st3, ['A','B'], 'deriv-3', 'res-3'); }
+
+// TIPO 2
+let st2 = { steps: ['S'], str: 'S' };
+function apply2(to) { genericApply(st2, 'S', to, ['S'], 'deriv-2', 'res-2'); }
+function reset2() { st2 = { steps: ['S'], str: 'S' }; renderG(st2, ['S'], 'deriv-2', 'res-2'); }
+
+// TIPO 1
+let st1 = { steps: ['S'], str: 'S' };
+function apply1(from, to) { genericApply(st1, from, to, ['S','X'], 'deriv-1', 'res-1'); }
+function reset1() { st1 = { steps: ['S'], str: 'S' }; renderG(st1, ['S','X'], 'deriv-1', 'res-1'); }
+
+// TIPO 0
+let st0 = { steps: ['S'], str: 'S' };
+function apply0(from, to) { genericApply(st0, from, to, ['S','T'], 'deriv-0', 'res-0'); }
+function reset0() { st0 = { steps: ['S'], str: 'S' }; renderG(st0, ['S','T'], 'deriv-0', 'res-0'); }
+
+renderG(st3, ['A','B'], 'deriv-3', 'res-3');
+renderG(st2, ['S'], 'deriv-2', 'res-2');
+renderG(st1, ['S','X'], 'deriv-1', 'res-1');
+renderG(st0, ['S','T'], 'deriv-0', 'res-0');
 </script>
 
 </body>
