@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Del lenguaje a la gramática — Construcción interactiva</title>
+<style>
+:root {
+  --color-text-primary: #e4e4e7;
+  --color-text-secondary: #a1a1aa;
+  --color-text-info: #60a5fa;
+  --color-text-success: #4ade80;
+  --color-text-warning: #fbbf24;
+  --color-background-primary: #18181b;
+  --color-background-secondary: #27272a;
+  --color-background-info: rgba(96, 165, 250, 0.15);
+  --color-background-success: rgba(74, 222, 128, 0.15);
+  --color-background-warning: rgba(251, 191, 36, 0.15);
+  --color-border-tertiary: #3f3f46;
+  --border-radius-lg: 12px;
+  --border-radius-md: 8px;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  padding: 2rem;
+  max-width: 860px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+h2 { margin-bottom: 1.5rem; }
+.section { margin: 0 0 1.5rem; }
+.section-title { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 10px; }
+.lang-box { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; margin: 0 0 16px; text-align: center; }
+.lang-formula { font-family: var(--font-mono); font-size: 16px; color: var(--color-text-primary); font-weight: 500; }
+.lang-note { font-size: 12px; color: var(--color-text-secondary); margin: 6px 0 0; }
+.parts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 0 0 16px; }
+.part-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 12px 14px; }
+.part-header { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; }
+.part-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.part-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+.badge-x { background: var(--color-background-info); color: var(--color-text-info); }
+.badge-y { background: var(--color-background-warning); color: var(--color-text-warning); }
+.badge-z { background: var(--color-background-success); color: var(--color-text-success); }
+.part-formula { font-family: var(--font-mono); font-size: 13px; color: var(--color-text-primary); margin: 0 0 6px; }
+.part-meaning { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 8px; line-height: 1.5; }
+.part-rules { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 12px; }
+.rule-line { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); line-height: 1.8; }
+.nt { color: var(--color-text-info); font-weight: 500; }
+.sep { color: var(--color-text-warning); font-weight: 500; }
+.part-examples { font-size: 11px; color: var(--color-text-secondary); margin: 6px 0 0; }
+.full-grammar { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; margin: 0 0 16px; }
+.fg-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.fg-line { font-family: var(--font-mono); font-size: 13px; color: var(--color-text-primary); line-height: 1.9; }
+.try-section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+.try-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 6px; }
+.try-sub { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 12px; }
+.deriv-display { font-family: var(--font-mono); font-size: 14px; color: var(--color-text-primary); line-height: 2.2; min-height: 36px; margin: 0 0 12px; word-break: break-all; }
+.highlight-nt { color: var(--color-text-info); font-weight: 500; }
+.highlight-t { color: var(--color-text-success); }
+.arrow-sym { color: var(--color-text-secondary); margin: 0 3px; }
+.btn-group { margin: 0 0 10px; }
+.btn-group-label { font-size: 11px; color: var(--color-text-secondary); margin: 0 0 4px; }
+.btn-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 8px; }
+.btn-row button {
+  font-size: 12px;
+  padding: 5px 10px;
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-row button:hover { background: var(--color-border-tertiary); }
+button.reset-btn {
+  font-size: 12px;
+  padding: 5px 12px;
+  background: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+button.reset-btn:hover { background: var(--color-border-tertiary); }
+.result-msg { min-height: 20px; margin-top: 8px; }
+.result-word { font-size: 14px; font-weight: 500; color: var(--color-text-success); }
+.result-check { font-size: 12px; color: var(--color-text-secondary); margin: 4px 0 0; }
+.warn-msg { font-size: 12px; color: var(--color-text-warning); }
+.legend { display: flex; gap: 14px; margin: 12px 0 0; font-size: 12px; color: var(--color-text-secondary); flex-wrap: wrap; }
+.legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<h2>Construcción interactiva de una gramática a partir del lenguaje L = {(cⁱ | b) · (ab)ʲ · aᵏ}</h2>
+
+<!-- LENGUAJE ORIGINAL -->
+<div class="section">
+  <div class="section-title">Lenguaje dado</div>
+  <div class="lang-box">
+    <div class="lang-formula">L = { (c<sup>i</sup> | b) . (ab)<sup>j</sup> . a<sup>k</sup> / i > 0, j ≥ 0, k ≥ 0 }</div>
+    <p class="lang-note">Hay que construir la gramática que genere exactamente este lenguaje</p>
+  </div>
+</div>
+
+<!-- PASO 2: SEPARAR EN PARTES -->
+<div class="section">
+  <div class="section-title">Paso 1 — Separar por la concatenación</div>
+  <div class="parts-grid">
+    <div class="part-card">
+      <div class="part-header">
+        <span class="part-name">Sección X</span>
+        <span class="part-badge badge-x">primera</span>
+      </div>
+      <p class="part-formula">(c<sup>i</sup> | b) con i > 0</p>
+      <p class="part-meaning">"O bien varias c, o una sola b". Como i > 0, al menos una c.</p>
+      <div class="part-rules">
+        <div class="rule-line"><span class="nt">X</span> ::= b <span class="sep">|</span> <span class="nt">T</span></div>
+        <div class="rule-line"><span class="nt">T</span> ::= c<span class="nt">T</span> <span class="sep">|</span> c</div>
+      </div>
+      <p class="part-examples">Genera: b, c, cc, ccc, cccc...</p>
+    </div>
+    <div class="part-card">
+      <div class="part-header">
+        <span class="part-name">Sección Y</span>
+        <span class="part-badge badge-y">segunda</span>
+      </div>
+      <p class="part-formula">(ab)<sup>j</sup> con j ≥ 0</p>
+      <p class="part-meaning">"ab" repetido j veces. Como j ≥ 0, puede ser λ (nada).</p>
+      <div class="part-rules">
+        <div class="rule-line"><span class="nt">Y</span> ::= ab<span class="nt">Y</span> <span class="sep">|</span> λ</div>
+      </div>
+      <p class="part-examples">Genera: λ, ab, abab, ababab...</p>
+    </div>
+    <div class="part-card">
+      <div class="part-header">
+        <span class="part-name">Sección Z</span>
+        <span class="part-badge badge-z">tercera</span>
+      </div>
+      <p class="part-formula">a<sup>k</sup> con k ≥ 0</p>
+      <p class="part-meaning">"a" repetida k veces. Como k ≥ 0, puede ser λ (nada).</p>
+      <div class="part-rules">
+        <div class="rule-line"><span class="nt">Z</span> ::= a<span class="nt">Z</span> <span class="sep">|</span> λ</div>
+      </div>
+      <p class="part-examples">Genera: λ, a, aa, aaa, aaaa...</p>
+    </div>
+  </div>
+</div>
+
+<!-- GRAMÁTICA COMPLETA -->
+<div class="section">
+  <div class="section-title">Paso 2 — Gramática completa</div>
+  <div class="full-grammar">
+    <p class="fg-title">G = ( Σ<sub>T</sub> , Σ<sub>N</sub> , S , P )</p>
+    <div class="fg-line">Σ<sub>T</sub> = { a, b, c } &nbsp;&nbsp; Σ<sub>N</sub> = { S, X, T, Y, Z } &nbsp;&nbsp; S = S</div>
+    <div class="fg-line" style="margin-top:4px;">
+      <span class="nt">S</span> ::= <span class="nt">X</span><span class="nt">Y</span><span class="nt">Z</span> &nbsp;&nbsp;
+      <span class="nt">X</span> ::= b <span class="sep">|</span> <span class="nt">T</span> &nbsp;&nbsp;
+      <span class="nt">T</span> ::= c<span class="nt">T</span> <span class="sep">|</span> c &nbsp;&nbsp;
+      <span class="nt">Y</span> ::= ab<span class="nt">Y</span> <span class="sep">|</span> λ &nbsp;&nbsp;
+      <span class="nt">Z</span> ::= a<span class="nt">Z</span> <span class="sep">|</span> λ
+    </div>
+  </div>
+</div>
+
+<!-- DERIVACIÓN INTERACTIVA -->
+<div class="section">
+  <div class="section-title">Paso 3 — Probá la gramática</div>
+  <div class="try-section">
+    <p class="try-title">Derivá palabras para verificar que pertenecen al lenguaje</p>
+    <p class="try-sub">Primero expandí S, después resolvé X, Y, Z en cualquier orden</p>
+    <div class="deriv-display" id="deriv-main"></div>
+
+    <div class="btn-group">
+      <p class="btn-group-label">Axioma</p>
+      <div class="btn-row">
+        <button onclick="applyRule('S','XYZ')">S → XYZ</button>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <p class="btn-group-label">Sección X — (cⁱ | b)</p>
+      <div class="btn-row">
+        <button onclick="applyRule('X','b')">X → b</button>
+        <button onclick="applyRule('X','T')">X → T</button>
+        <button onclick="applyRule('T','cT')">T → cT</button>
+        <button onclick="applyRule('T','c')">T → c</button>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <p class="btn-group-label">Sección Y — (ab)ʲ</p>
+      <div class="btn-row">
+        <button onclick="applyRule('Y','abY')">Y → abY</button>
+        <button onclick="applyRule('Y','')">Y → λ</button>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <p class="btn-group-label">Sección Z — aᵏ</p>
+      <div class="btn-row">
+        <button onclick="applyRule('Z','aZ')">Z → aZ</button>
+        <button onclick="applyRule('Z','')">Z → λ</button>
+      </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetMain()">Reiniciar</button>
+
+    <div class="result-msg" id="res-main"></div>
+    <div class="legend">
+      <span><span class="legend-dot" style="background: var(--color-text-info);"></span>No terminal</span>
+      <span><span class="legend-dot" style="background: var(--color-text-success);"></span>Terminal</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = { steps: ['S'], str: 'S' };
+const NTS = ['S','X','T','Y','Z'];
+
+function col(str) {
+  if (str === 'λ') return '<span class="highlight-t">λ</span>';
+  let res = '';
+  for (let ch of str) {
+    if (NTS.includes(ch)) res += '<span class="highlight-nt">' + ch + '</span>';
+    else res += '<span class="highlight-t">' + ch + '</span>';
+  }
+  return res;
+}
+
+function render() {
+  const d = document.getElementById('deriv-main');
+  d.innerHTML = state.steps.map(s => col(s)).join('<span class="arrow-sym"> → </span>');
+  const r = document.getElementById('res-main');
+  const hasNT = NTS.some(nt => state.str.includes(nt));
+  if (!hasNT && state.steps.length > 1) {
+    const word = state.str === '' ? 'λ' : state.str;
+    let check = validateWord(word);
+    r.innerHTML = '<div class="result-word">Palabra generada: "' + word + '"</div>' +
+      '<div class="result-check">' + check + '</div>';
+  } else {
+    r.innerHTML = '';
+  }
+}
+
+function validateWord(w) {
+  if (w === 'λ') return '';
+  let pattern = /^(c+|b)(ab)*a*$/;
+  if (pattern.test(w)) {
+    let match = w.match(/^(c+|b)((ab)*)(a*)$/);
+    if (match) {
+      let part1 = match[1];
+      let part2 = match[2] || '';
+      let part3 = match[4] || '';
+      let x = part1 === 'b' ? 'b' : 'c<sup>' + part1.length + '</sup>';
+      let j = part2.length / 2;
+      let k = part3.length;
+      return 'Descomposición: (' + x + ') . (ab)<sup>' + j + '</sup> . a<sup>' + k + '</sup> — pertenece al lenguaje';
+    }
+  }
+  return '';
+}
+
+function applyRule(from, to) {
+  const idx = state.str.indexOf(from);
+  if (idx === -1) {
+    flashMsg('No se encuentra "' + from + '" en la forma actual');
+    return;
+  }
+  state.str = state.str.substring(0, idx) + to + state.str.substring(idx + from.length);
+  state.steps.push(state.str === '' ? 'λ' : state.str);
+  render();
+}
+
+function resetMain() {
+  state = { steps: ['S'], str: 'S' };
+  render();
+  document.getElementById('res-main').innerHTML = '';
+}
+
+function flashMsg(msg) {
+  const r = document.getElementById('res-main');
+  r.innerHTML = '<span class="warn-msg">' + msg + '</span>';
+  setTimeout(() => { if (r.textContent === msg) r.innerHTML = ''; }, 2000);
+}
+
+render();
+</script>
+
+</body>
+</html>
