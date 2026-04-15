@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gramáticas equivalentes — Comparación interactiva</title>
+<style>
+:root {
+  --color-text-primary: #e4e4e7;
+  --color-text-secondary: #a1a1aa;
+  --color-text-info: #60a5fa;
+  --color-text-success: #4ade80;
+  --color-text-warning: #fbbf24;
+  --color-background-primary: #18181b;
+  --color-background-secondary: #27272a;
+  --color-background-info: rgba(96, 165, 250, 0.15);
+  --color-background-success: rgba(74, 222, 128, 0.15);
+  --color-border-tertiary: #3f3f46;
+  --border-radius-lg: 12px;
+  --border-radius-md: 8px;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+h2 { margin-bottom: 1.5rem; }
+.main-title { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 12px; }
+.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 0 16px; }
+.col { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+.col-header { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
+.col-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+.col-badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+.badge-t2 { background: var(--color-background-info); color: var(--color-text-info); }
+.badge-t3 { background: var(--color-background-success); color: var(--color-text-success); }
+.grammar-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; margin: 0 0 10px; }
+.g-rule { font-family: var(--font-mono); font-size: 13px; color: var(--color-text-primary); line-height: 1.9; }
+.nt { color: var(--color-text-info); font-weight: 500; }
+.sep { color: var(--color-text-warning); font-weight: 500; }
+.g-note { font-size: 11px; color: var(--color-text-secondary); margin: 6px 0 0; }
+.deriv-display { font-family: var(--font-mono); font-size: 14px; color: var(--color-text-primary); line-height: 2.2; min-height: 36px; margin: 0 0 10px; word-break: break-all; }
+.highlight-nt { color: var(--color-text-info); font-weight: 500; }
+.highlight-t { color: var(--color-text-success); }
+.arrow-sym { color: var(--color-text-secondary); margin: 0 3px; }
+.btn-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 6px; }
+.btn-row button {
+  font-size: 12px;
+  padding: 5px 10px;
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-row button:hover { background: var(--color-border-tertiary); }
+.result-msg { min-height: 20px; margin-top: 6px; }
+.result-word { font-size: 13px; font-weight: 500; color: var(--color-text-success); }
+.warn-msg { font-size: 12px; color: var(--color-text-warning); }
+.words-section { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; margin: 0 0 16px; }
+.words-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.words-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.words-col-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 4px; }
+.word-list { font-family: var(--font-mono); font-size: 13px; color: var(--color-text-primary); line-height: 1.8; min-height: 24px; }
+.word-item { display: inline-block; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; padding: 2px 8px; margin: 2px 4px 2px 0; font-size: 12px; }
+.match-box { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 18px; text-align: center; }
+.match-status { font-size: 14px; font-weight: 500; margin: 0 0 4px; }
+.match-note { font-size: 12px; color: var(--color-text-secondary); margin: 0; }
+.conclusion { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; margin: 16px 0 0; }
+.conclusion-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.conclusion-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.7; margin: 0; }
+.conclusion-text strong { font-weight: 500; }
+</style>
+</head>
+<body>
+
+<h2>Comparación interactiva de dos gramáticas equivalentes que generan el mismo lenguaje</h2>
+
+<p class="main-title">Gramáticas equivalentes — mismas palabras, reglas distintas</p>
+
+<div class="columns">
+  <!-- GRAMÁTICA 1 - TIPO 2 -->
+  <div class="col">
+    <div class="col-header">
+      <p class="col-title">Gramática 1</p>
+      <span class="col-badge badge-t2">tipo 2</span>
+    </div>
+    <div class="grammar-box">
+      <div class="g-rule"><span class="nt">S</span> ::= ab<span class="nt">S</span> <span class="sep">|</span> λ</div>
+      <p class="g-note">Tipo 2 porque "abS" tiene 3 símbolos a la derecha</p>
+    </div>
+    <div class="deriv-display" id="deriv-g1"></div>
+    <div class="btn-row">
+      <button onclick="applyG1('abS')">S → abS</button>
+      <button onclick="applyG1('λ')">S → λ</button>
+      <button onclick="resetG1()" style="color:var(--color-text-secondary);">Reiniciar</button>
+    </div>
+    <div class="result-msg" id="res-g1"></div>
+  </div>
+
+  <!-- GRAMÁTICA 2 - TIPO 3 -->
+  <div class="col">
+    <div class="col-header">
+      <p class="col-title">Gramática 2</p>
+      <span class="col-badge badge-t3">tipo 3</span>
+    </div>
+    <div class="grammar-box">
+      <div class="g-rule"><span class="nt">S</span> ::= a<span class="nt">N</span> <span class="sep">|</span> λ</div>
+      <div class="g-rule"><span class="nt">N</span> ::= b<span class="nt">S</span></div>
+      <p class="g-note">Tipo 3 porque cada regla tiene máximo 1 terminal + 1 NT</p>
+    </div>
+    <div class="deriv-display" id="deriv-g2"></div>
+    <div class="btn-row">
+      <button onclick="applyG2('S','aN')">S → aN</button>
+      <button onclick="applyG2('S','λ')">S → λ</button>
+      <button onclick="applyG2('N','bS')">N → bS</button>
+      <button onclick="resetG2()" style="color:var(--color-text-secondary);">Reiniciar</button>
+    </div>
+    <div class="result-msg" id="res-g2"></div>
+  </div>
+</div>
+
+<!-- PALABRAS GENERADAS -->
+<div class="words-section">
+  <p class="words-title">Palabras generadas hasta ahora</p>
+  <div class="words-grid">
+    <div>
+      <p class="words-col-title">Gramática 1 (tipo 2)</p>
+      <div class="word-list" id="words-g1"><span style="color:var(--color-text-secondary);font-size:12px;">Generá palabras arriba...</span></div>
+    </div>
+    <div>
+      <p class="words-col-title">Gramática 2 (tipo 3)</p>
+      <div class="word-list" id="words-g2"><span style="color:var(--color-text-secondary);font-size:12px;">Generá palabras arriba...</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="match-box" id="match-box">
+  <p class="match-status" id="match-status" style="color:var(--color-text-secondary);">Generá palabras con ambas gramáticas para compararlas</p>
+  <p class="match-note" id="match-note"></p>
+</div>
+
+<div class="conclusion">
+  <p class="conclusion-title">Principios clave</p>
+  <p class="conclusion-text">
+    <strong>1.</strong> Un lenguaje puede ser generado por muchas gramáticas diferentes, incluso de distinta jerarquía.<br>
+    <strong>2.</strong> Una gramática solo genera un único lenguaje.<br>
+    <strong>3.</strong> El tipo del lenguaje es el más restrictivo (número más alto) entre todas las gramáticas que lo generan.<br>
+    <strong>→</strong> Este lenguaje { λ, ab, abab, ababab... } es de <strong>tipo 3</strong>, porque existe una gramática tipo 3 que lo genera.
+  </p>
+</div>
+
+<script>
+let g1 = { steps: ['S'], str: 'S', words: [] };
+let g2 = { steps: ['S'], str: 'S', words: [] };
+
+function col(str, nts) {
+  if (str === 'λ') return '<span class="highlight-t">λ</span>';
+  let res = '';
+  for (let ch of str) {
+    if (nts.includes(ch)) res += '<span class="highlight-nt">' + ch + '</span>';
+    else res += '<span class="highlight-t">' + ch + '</span>';
+  }
+  return res;
+}
+
+function renderDeriv(state, nts, derivId, resId) {
+  const d = document.getElementById(derivId);
+  d.innerHTML = state.steps.map(s => col(s, nts)).join('<span class="arrow-sym"> → </span>');
+  const hasNT = nts.some(nt => state.str.includes(nt));
+  const r = document.getElementById(resId);
+  if (!hasNT && state.steps.length > 1) {
+    const word = state.str === '' ? 'λ' : state.str;
+    r.innerHTML = '<span class="result-word">Palabra: "' + word + '"</span>';
+  } else {
+    r.innerHTML = '';
+  }
+}
+
+function addWord(state, listId) {
+  const word = state.str === '' ? 'λ' : state.str;
+  if (!state.words.includes(word)) {
+    state.words.push(word);
+    state.words.sort((a, b) => a.length - b.length);
+  }
+  const el = document.getElementById(listId);
+  el.innerHTML = state.words.map(w => '<span class="word-item">' + w + '</span>').join('');
+  updateMatch();
+}
+
+function applyG1(to) {
+  const idx = g1.str.indexOf('S');
+  if (idx === -1) { flashMsg('res-g1', 'No hay S para reemplazar'); return; }
+  if (to === 'λ') {
+    g1.str = g1.str.substring(0, idx) + g1.str.substring(idx + 1);
+    g1.steps.push(g1.str === '' ? 'λ' : g1.str);
+  } else {
+    g1.str = g1.str.substring(0, idx) + to.replace('S', 'S') + g1.str.substring(idx + 1);
+    g1.steps.push(g1.str);
+  }
+  renderDeriv(g1, ['S'], 'deriv-g1', 'res-g1');
+  const hasNT = g1.str.includes('S');
+  if (!hasNT) addWord(g1, 'words-g1');
+}
+
+function applyG2(from, to) {
+  const idx = g2.str.indexOf(from);
+  if (idx === -1) { flashMsg('res-g2', 'No hay ' + from + ' para reemplazar'); return; }
+  if (to === 'λ') {
+    g2.str = g2.str.substring(0, idx) + g2.str.substring(idx + from.length);
+    g2.steps.push(g2.str === '' ? 'λ' : g2.str);
+  } else {
+    g2.str = g2.str.substring(0, idx) + to + g2.str.substring(idx + from.length);
+    g2.steps.push(g2.str);
+  }
+  renderDeriv(g2, ['S', 'N'], 'deriv-g2', 'res-g2');
+  const hasNT = g2.str.includes('S') || g2.str.includes('N');
+  if (!hasNT) addWord(g2, 'words-g2');
+}
+
+function resetG1() {
+  g1.steps = ['S']; g1.str = 'S';
+  renderDeriv(g1, ['S'], 'deriv-g1', 'res-g1');
+  document.getElementById('res-g1').innerHTML = '';
+}
+
+function resetG2() {
+  g2.steps = ['S']; g2.str = 'S';
+  renderDeriv(g2, ['S', 'N'], 'deriv-g2', 'res-g2');
+  document.getElementById('res-g2').innerHTML = '';
+}
+
+function updateMatch() {
+  const status = document.getElementById('match-status');
+  const note = document.getElementById('match-note');
+  if (g1.words.length === 0 || g2.words.length === 0) {
+    status.style.color = 'var(--color-text-secondary)';
+    status.textContent = 'Generá palabras con ambas gramáticas para compararlas';
+    note.textContent = '';
+    return;
+  }
+  const common = g1.words.filter(w => g2.words.includes(w));
+  const onlyG1 = g1.words.filter(w => !g2.words.includes(w));
+  const onlyG2 = g2.words.filter(w => !g1.words.includes(w));
+  if (onlyG1.length === 0 && onlyG2.length === 0) {
+    status.style.color = 'var(--color-text-success)';
+    status.textContent = 'Todas las palabras coinciden — son equivalentes';
+    note.textContent = 'Ambas gramáticas generan: { ' + common.join(', ') + ', ... }';
+  } else {
+    status.style.color = 'var(--color-text-info)';
+    status.textContent = common.length + ' palabra(s) en común hasta ahora';
+    note.textContent = 'Seguí generando para ver que siempre coinciden';
+  }
+}
+
+function flashMsg(id, msg) {
+  const r = document.getElementById(id);
+  r.innerHTML = '<span class="warn-msg">' + msg + '</span>';
+  setTimeout(() => { if (r.textContent === msg) r.innerHTML = ''; }, 2000);
+}
+
+renderDeriv(g1, ['S'], 'deriv-g1', 'res-g1');
+renderDeriv(g2, ['S', 'N'], 'deriv-g2', 'res-g2');
+</script>
+
+</body>
+</html>
